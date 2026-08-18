@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal do Aluno — UNIPAR</title>
+    <style>
+        :root {
+            --blue: #1d4ed8;
+            --blue-dark: #1e40af;
+            --blue-light: #eff6ff;
+            --green: #16a34a;
+            --red: #dc2626;
+            --red-light: #fef2f2;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-400: #9ca3af;
+            --gray-600: #4b5563;
+            --gray-800: #1f2937;
+            --white: #ffffff;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --radius: 8px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--gray-50);
+            color: var(--gray-800);
+            min-height: 100vh;
+        }
+
+        header {
+            background: var(--blue);
+            color: white;
+            padding: 0 32px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow-md);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .logo-badge {
+            background: white;
+            color: var(--blue);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        nav {
+            display: flex;
+            gap: 24px;
+        }
+
+        nav a {
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        nav a:hover, nav a.active { color: white; }
+
+        main {
+            max-width: 960px;
+            margin: 40px auto;
+            padding: 0 24px;
+        }
+
+        .page { display: none; }
+        .page.active { display: block; }
+
+        .page-header { margin-bottom: 28px; }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+
+        .page-subtitle {
+            color: var(--gray-600);
+            margin-top: 4px;
+            font-size: 0.9rem;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: var(--radius);
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow);
+            padding: 28px;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group.full { grid-column: span 2; }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--gray-600);
+        }
+
+        label .required { color: var(--red); }
+
+        input, select, textarea {
+            padding: 10px 14px;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            font-size: 0.9rem;
+            font-family: inherit;
+            color: var(--gray-800);
+            background: var(--white);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(29,78,216,0.1);
+        }
+
+        input.error, select.error { border-color: var(--red); }
+
+        .field-error {
+            font-size: 0.78rem;
+            color: var(--red);
+            display: none;
+        }
+
+        .field-error.visible { display: block; }
+
+        .btn {
+            padding: 10px 24px;
+            border-radius: var(--radius);
+            border: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .btn-primary { background: var(--blue); color: white; }
+        .btn-primary:hover { background: var(--blue-dark); }
+        .btn-secondary { background: var(--gray-100); color: var(--gray-800); border: 1px solid var(--gray-200); }
+        .btn-danger { background: var(--red); color: white; }
+        .btn-sm { padding: 6px 14px; font-size: 0.8rem; }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: var(--radius);
+            font-size: 0.88rem;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.visible { display: flex; align-items: flex-start; gap: 10px; }
+        .alert-success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d; }
+        .alert-error { background: var(--red-light); border: 1px solid #fecaca; color: var(--red); }
+        .alert-info { background: var(--blue-light); border: 1px solid #bfdbfe; color: var(--blue-dark); }
+
+        table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+
+        th {
+            background: var(--gray-50);
+            padding: 10px 14px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--gray-600);
+            border-bottom: 1px solid var(--gray-200);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--gray-100);
+            vertical-align: middle;
+        }
+
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: var(--gray-50); }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-green { background: #dcfce7; color: #15803d; }
+        .badge-red { background: #fee2e2; color: #dc2626; }
+        .badge-blue { background: #dbeafe; color: #1d4ed8; }
+        .badge-yellow { background: #fef9c3; color: #a16207; }
+        .badge-gray { background: var(--gray-100); color: var(--gray-600); }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-value { font-size: 2rem; font-weight: 700; color: var(--blue); }
+        .stat-label { font-size: 0.82rem; color: var(--gray-600); margin-top: 4px; }
+
+        .empty-state { text-align: center; padding: 48px 24px; color: var(--gray-400); }
+        .empty-state-icon { font-size: 2.5rem; margin-bottom: 12px; }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--gray-200);
+            margin-bottom: 24px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 0.88rem;
+            color: var(--gray-600);
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+            transition: all 0.2s;
+        }
+
+        .tab:hover { color: var(--blue); }
+        .tab.active { color: var(--blue); border-bottom-color: var(--blue); font-weight: 600; }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        .disciplinas-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .disc-card {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            padding: 18px;
+            box-shadow: var(--shadow);
+        }
+
+        .disc-name { font-weight: 600; font-size: 0.95rem; margin-bottom: 4px; }
+        .disc-meta { font-size: 0.8rem; color: var(--gray-600); margin-bottom: 12px; }
+
+        .nota-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            padding: 4px 0;
+        }
+
+        .media-final {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 10px;
+            margin-top: 10px;
+            border-top: 1px solid var(--gray-200);
+            font-weight: 600;
+        }
+
+        .progress-bar-bg {
+            height: 6px;
+            background: var(--gray-200);
+            border-radius: 3px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .progress-bar { height: 100%; border-radius: 3px; }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.open { display: flex; }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            padding: 28px;
+            width: 480px;
+            max-width: calc(100vw - 48px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+
+        .modal-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 24px;
+        }
+
+        hr { border: none; border-top: 1px solid var(--gray-200); margin: 24px 0; }
+
+        .helptext { font-size: 0.78rem; color: var(--gray-400); margin-top: 3px; }
+
+        @media (max-width: 500px) {
+            .stats { grid-template-columns: 1fr; }
+            .disciplinas-grid { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+            .form-group.full { grid-column: span 1; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <div class="logo-badge">UNIPAR</div>
+        Portal do Aluno
+    </div>
+    <nav>
+        <a onclick="showPage('dashboard')" id="nav-dashboard" class="active">Início</a>
+        <a onclick="showPage('notas')" id="nav-notas">Notas</a>
+        <a onclick="showPage('matricula')" id="nav-matricula">Matrícula</a>
+        <a onclick="showPage('perfil')" id="nav-perfil">Meu Perfil</a>
+    </nav>
+</header>
+
+<main>
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page active">
+        <div class="page-header">
+            <div class="page-title">Olá, Estudante 👋</div>
+            <div class="page-subtitle">Aqui está um resumo da sua situação acadêmica.</div>
+        </div>
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="stat-disciplinas">4</div>
+                <div class="stat-label">Disciplinas matriculadas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-media">0.0</div>
+                <div class="stat-label">Média geral do semestre</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-freq">0%</div>
+                <div class="stat-label">Frequência média</div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title">⚠️ Avisos Importantes</div>
+            <div class="alert alert-info visible">
+                <span>ℹ️</span>
+                <span>O prazo para solicitação de revisão de provas encerra em <strong>10/09/2025</strong>.</span>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title">Acesso Rápido</div>
+            <div style="display:flex; gap: 12px; flex-wrap: wrap;">
+                <button class="btn btn-primary" onclick="showPage('notas')">Ver Notas</button>
+                <button class="btn btn-secondary" onclick="showPage('matricula')">Gerenciar Matrícula</button>
+                <button class="btn btn-secondary" onclick="showPage('perfil')">Atualizar Perfil</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTAS -->
+    <div id="page-notas" class="page">
+        <div class="page-header">
+            <div class="page-title">Notas e Frequência</div>
+            <div class="page-subtitle">Acompanhe seu desempenho em cada disciplina.</div>
+        </div>
+        <div class="card">
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('tab-notas', this)">Notas</div>
+                <div class="tab" onclick="switchTab('tab-frequencia', this)">Frequência</div>
+                <div class="tab" onclick="switchTab('tab-historico', this)">Histórico</div>
+            </div>
+            <div id="tab-notas" class="tab-content active">
+                <div class="disciplinas-grid" id="disciplinas-grid"></div>
+            </div>
+            <div id="tab-frequencia" class="tab-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Disciplina</th>
+                            <th>Aulas Previstas</th>
+                            <th>Faltas</th>
+                            <th>Frequência</th>
+                            <th>Situação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="freq-tbody"></tbody>
+                </table>
+            </div>
+            <div id="tab-historico" class="tab-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Período</th>
+                            <th>Disciplina</th>
+                            <th>Carga Horária</th>
+                            <th>Média Final</th>
+                            <th>Resultado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historico-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MATRÍCULA -->
+    <div id="page-matricula" class="page">
+        <div class="page-header">
+            <div class="page-title">Matrícula em Disciplinas</div>
+            <div class="page-subtitle">Gerencie sua matrícula para o próximo semestre.</div>
+        </div>
+        <div id="mat-alert" class="alert"></div>
+        <div class="card">
+            <div class="card-title">Matricular em nova disciplina</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="mat-periodo">Período <span class="required">*</span></label>
+                    <select id="mat-periodo">
+                        <option value="">Selecione</option>
+                        <option value="2025/1">2025/1</option>
+                        <option value="2025/2">2025/2</option>
+                        <option value="2026/1">2026/1</option>
+                    </select>
+                    <span class="field-error" id="err-periodo">Selecione um período.</span>
+                </div>
+                <div class="form-group">
+                    <label for="mat-disciplina">Disciplina <span class="required">*</span></label>
+                    <select id="mat-disciplina">
+                        <option value="">Selecione</option>
+                        <option value="Cálculo I">Cálculo I</option>
+                        <option value="Banco de Dados">Banco de Dados</option>
+                        <option value="Redes de Computadores">Redes de Computadores</option>
+                        <option value="Engenharia de Software">Engenharia de Software</option>
+                        <option value="Estruturas de Dados">Estruturas de Dados</option>
+                        <option value="Inteligência Artificial">Inteligência Artificial</option>
+                        <option value="Testing e QA">Testing e QA</option>
+                    </select>
+                    <span class="field-error" id="err-disciplina">Selecione uma disciplina.</span>
+                </div>
+                <div class="form-group">
+                    <label for="mat-turno">Turno <span class="required">*</span></label>
+                    <select id="mat-turno">
+                        <option value="">Selecione</option>
+                        <option value="Manhã">Manhã</option>
+                        <option value="Tarde">Tarde</option>
+                        <option value="Noite">Noite</option>
+                    </select>
+                    <span class="field-error" id="err-turno">Selecione um turno.</span>
+                </div>
+                <div class="form-group">
+                    <label for="mat-creditos">Créditos</label>
+                    <input type="number" id="mat-creditos" value="4" min="1" max="8">
+                    <span class="helptext">Entre 1 e 8 créditos</span>
+                    <span class="field-error" id="err-creditos">Valor inválido para créditos.</span>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-primary" onclick="matricular()">Confirmar Matrícula</button>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title">Disciplinas Matriculadas</div>
+            <div id="mat-lista-vazia" class="empty-state" style="display:none">
+                <div class="empty-state-icon">📚</div>
+                <div>Nenhuma matrícula registrada.</div>
+            </div>
+            <table id="mat-table">
+                <thead>
+                    <tr>
+                        <th>Disciplina</th>
+                        <th>Período</th>
+                        <th>Turno</th>
+                        <th>Créditos</th>
+                        <th>Status</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody id="mat-tbody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- PERFIL -->
+    <div id="page-perfil" class="page">
+        <div class="page-header">
+            <div class="page-title">Meu Perfil</div>
+            <div class="page-subtitle">Mantenha seus dados pessoais atualizados.</div>
+        </div>
+        <div id="perfil-alert" class="alert"></div>
+        <div class="card">
+            <div class="card-title">Dados Pessoais</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="p-nome">Nome completo <span class="required">*</span></label>
+                    <input type="text" id="p-nome" placeholder="Seu nome completo">
+                    <span class="field-error" id="err-nome">Nome é obrigatório.</span>
+                </div>
+                <div class="form-group">
+                    <label for="p-ra">RA (Registro Acadêmico)</label>
+                    <input type="text" id="p-ra" value="20250001" readonly>
+                    <span class="helptext">O RA não pode ser alterado.</span>
+                </div>
+                <div class="form-group">
+                    <label for="p-email">E-mail <span class="required">*</span></label>
+                    <input type="text" id="p-email" placeholder="seu@email.com">
+                    <span class="field-error" id="err-email">E-mail inválido.</span>
+                </div>
+                <div class="form-group">
+                    <label for="p-telefone">Telefone</label>
+                    <input type="text" id="p-telefone" placeholder="(44) 99999-9999" maxlength="15">
+                </div>
+                <div class="form-group">
+                    <label for="p-cpf">CPF <span class="required">*</span></label>
+                    <input type="text" id="p-cpf" placeholder="000.000.000-00" maxlength="14">
+                    <span class="field-error" id="err-cpf">CPF inválido.</span>
+                </div>
+                <div class="form-group">
+                    <label for="p-nascimento">Data de Nascimento <span class="required">*</span></label>
+                    <input type="text" id="p-nascimento" placeholder="DD/MM/AAAA" maxlength="10">
+                    <span class="field-error" id="err-nascimento">Data inválida. O aluno deve ter entre 16 e 80 anos.</span>
+                </div>
+                <div class="form-group full">
+                    <label for="p-endereco">Endereço</label>
+                    <input type="text" id="p-endereco" placeholder="Rua, número, bairro">
+                </div>
+            </div>
+            <hr>
+            <div class="card-title" style="margin-top:0; border-bottom:none; padding-bottom:0">Alterar Senha</div>
+            <div class="form-row" style="margin-top:16px">
+                <div class="form-group">
+                    <label for="p-senha-atual">Senha atual</label>
+                    <input type="password" id="p-senha-atual" placeholder="••••••••">
+                </div>
+                <div style="grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group">
+                        <label for="p-senha-nova">Nova senha</label>
+                        <input type="password" id="p-senha-nova" placeholder="Mínimo 8 caracteres">
+                        <span class="field-error" id="err-senha-nova">A senha deve ter no mínimo 8 caracteres.</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="p-senha-conf">Confirmar nova senha</label>
+                        <input type="password" id="p-senha-conf" placeholder="Repita a senha">
+                        <span class="field-error" id="err-senha-conf">As senhas não coincidem.</span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="cancelarPerfil()">Cancelar</button>
+                <button class="btn btn-primary" onclick="salvarPerfil()">Salvar Alterações</button>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<!-- MODAL CANCELAR MATRÍCULA -->
+<div class="modal-overlay" id="modal-cancelar">
+    <div class="modal">
+        <div class="modal-title">Cancelar Matrícula</div>
+        <p style="font-size:0.9rem; color: var(--gray-600)">
+            Tem certeza que deseja cancelar a matrícula em <strong id="modal-disc-nome"></strong>?
+            Esta ação não pode ser desfeita.
+        </p>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="fecharModal()">Voltar</button>
+            <button class="btn btn-danger" onclick="confirmarCancelamento()">Sim, cancelar matrícula</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const state = {
+        matriculas: [
+            { id: 1, disciplina: 'Testing e QA', periodo: '2025/2', turno: 'Noite', creditos: 4, status: 'ativa' },
+            { id: 2, disciplina: 'Banco de Dados', periodo: '2025/2', turno: 'Noite', creditos: 4, status: 'ativa' },
+            { id: 3, disciplina: 'Engenharia de Software', periodo: '2025/2', turno: 'Noite', creditos: 4, status: 'ativa' },
+            { id: 4, disciplina: 'Redes de Computadores', periodo: '2025/2', turno: 'Noite', creditos: 4, status: 'ativa' },
+        ],
+        nextId: 5,
+        pendingCancel: null,
+        disciplinas: [
+            {
+                nome: 'Testing e QA',
+                professor: 'Prof. Dr. Marcos Oliveira',
+                n1: 8.5, n2: 7.0, n3: null,
+                faltas: 2, aulasPrevistas: 60
+            },
+            {
+                nome: 'Banco de Dados',
+                professor: 'Profa. Dra. Ana Lima',
+                n1: 9.0, n2: 8.0, n3: 7.5,
+                faltas: 0, aulasPrevistas: 60
+            },
+            {
+                nome: 'Engenharia de Software',
+                professor: 'Prof. Carlos Mendes',
+                n1: 6.0, n2: 5.5, n3: null,
+                faltas: 15, aulasPrevistas: 60
+            },
+            {
+                nome: 'Redes de Computadores',
+                professor: 'Prof. Roberto Santos',
+                n1: 7.5, n2: null, n3: null,
+                faltas: 5, aulasPrevistas: 60
+            }
+        ]
+    };
+
+    function showPage(page) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+        document.getElementById('page-' + page).classList.add('active');
+        document.getElementById('nav-' + page).classList.add('active');
+        if (page === 'notas') renderNotas();
+        if (page === 'matricula') renderMatriculas();
+        if (page === 'dashboard') renderDashboard();
+    }
+
+    function switchTab(tabId, el) {
+        const card = el.closest('.card');
+        card.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        card.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+        document.getElementById(tabId).classList.add('active');
+    }
+
+    function calcMedia(d) {
+        const notas = [d.n1, d.n2, d.n3].filter(n => n !== null);
+        if (notas.length === 0) return null;
+        return notas.reduce((a, b) => a + b, 0) / notas.length;
+    }
+
+    function renderDashboard() {
+        const medias = state.disciplinas.map(calcMedia).filter(m => m !== null);
+        const mediaGeral = medias.length > 0 ? medias.reduce((a, b) => a + b, 0) / medias.length : 0;
+        const freqs = state.disciplinas.map(d => ((d.aulasPrevistas - d.faltas) / d.aulasPrevistas) * 100);
+        const freqMedia = freqs.reduce((a, b) => a + b, 0) / freqs.length;
+
+        document.getElementById('stat-disciplinas').textContent = state.matriculas.filter(m => m.status === 'ativa').length;
+        document.getElementById('stat-media').textContent = mediaGeral.toFixed(1);
+        document.getElementById('stat-freq').textContent = Math.round(freqMedia) + '%';
+    }
+
+    function renderNotas() {
+        const grid = document.getElementById('disciplinas-grid');
+        grid.innerHTML = '';
+        state.disciplinas.forEach(d => {
+            const notas = [d.n1, d.n2, d.n3];
+            const media = calcMedia(d);
+            const situacao = media === null ? 'Em andamento' : media >= 7 ? 'Aprovado' : 'Em risco';
+            const badgeClass = media === null ? 'badge-blue' : media >= 7 ? 'badge-green' : 'badge-red';
+            let notasHTML = '';
+            ['N1', 'N2', 'N3'].forEach((label, i) => {
+                notasHTML += `<div class="nota-row"><span>${label}</span><span>${notas[i] !== null ? notas[i].toFixed(1) : '—'}</span></div>`;
+            });
+            const freqPct = Math.round(((d.aulasPrevistas - d.faltas) / d.aulasPrevistas) * 100);
+            const freqColor = freqPct < 75 ? '#dc2626' : '#1d4ed8';
+            grid.innerHTML += `
+                <div class="disc-card">
+                    <div class="disc-name">${d.nome}</div>
+                    <div class="disc-meta">${d.professor}</div>
+                    ${notasHTML}
+                    <div class="media-final">
+                        <span>Média Parcial</span>
+                        <span>${media !== null ? media.toFixed(1) : '—'}</span>
+                    </div>
+                    <div style="margin-top:12px">
+                        <div style="display:flex;justify-content:space-between;font-size:0.78rem;color:var(--gray-600)">
+                            <span>Frequência</span>
+                            <span style="color:${freqColor}">${freqPct}%</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar" style="width:${freqPct}%;background:${freqColor}"></div>
+                        </div>
+                    </div>
+                    <div style="margin-top:12px">
+                        <span class="badge ${badgeClass}">${situacao}</span>
+                    </div>
+                </div>`;
+        });
+        renderFrequencia();
+        renderHistorico();
+    }
+
+    function renderFrequencia() {
+        const tbody = document.getElementById('freq-tbody');
+        tbody.innerHTML = '';
+        state.disciplinas.forEach(d => {
+            const freq = ((d.aulasPrevistas - d.faltas) / d.aulasPrevistas) * 100;
+            const freqArredondada = Math.round(freq);
+            const status = freqArredondada >= 75
+                ? '<span class="badge badge-green">Regular</span>'
+                : '<span class="badge badge-red">Reprovado por Falta</span>';
+            tbody.innerHTML += `
+                <tr>
+                    <td>${d.nome}</td>
+                    <td>${d.aulasPrevistas}</td>
+                    <td>${d.faltas}</td>
+                    <td>${freqArredondada}%</td>
+                    <td>${status}</td>
+                </tr>`;
+        });
+    }
+
+    function renderHistorico() {
+        const historico = [
+            { periodo: '2024/1', disciplina: 'Algoritmos e Lógica', ch: 80, media: 9.2, resultado: 'Aprovado' },
+            { periodo: '2024/1', disciplina: 'Introdução à Programação', ch: 80, media: 8.5, resultado: 'Aprovado' },
+            { periodo: '2024/2', disciplina: 'Programação Orientada a Objetos', ch: 80, media: 6.8, resultado: 'Aprovado' },
+            { periodo: '2024/2', disciplina: 'Matemática Discreta', ch: 60, media: 5.0, resultado: 'Reprovado' },
+        ];
+        const tbody = document.getElementById('historico-tbody');
+        tbody.innerHTML = '';
+        historico.forEach(h => {
+            const badge = h.resultado === 'Aprovado' ? 'badge-green' : 'badge-red';
+            tbody.innerHTML += `
+                <tr>
+                    <td>${h.periodo}</td>
+                    <td>${h.disciplina}</td>
+                    <td>${h.ch}h</td>
+                    <td>${h.media.toFixed(1)}</td>
+                    <td><span class="badge ${badge}">${h.resultado}</span></td>
+                </tr>`;
+        });
+    }
+
+    function renderMatriculas() {
+        const tbody = document.getElementById('mat-tbody');
+        const ativas = state.matriculas.filter(m => m.status === 'ativa');
+        if (ativas.length === 0) {
+            document.getElementById('mat-table').style.display = 'none';
+            document.getElementById('mat-lista-vazia').style.display = 'block';
+            return;
+        }
+        document.getElementById('mat-table').style.display = 'table';
+        document.getElementById('mat-lista-vazia').style.display = 'none';
+        tbody.innerHTML = '';
+        ativas.forEach(m => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${m.disciplina}</td>
+                    <td>${m.periodo}</td>
+                    <td>${m.turno}</td>
+                    <td>${m.creditos}</td>
+                    <td><span class="badge badge-green">Ativa</span></td>
+                    <td><button class="btn btn-sm btn-danger" onclick="abrirModalCancelamento(${m.id}, '${m.disciplina}')">Cancelar</button></td>
+                </tr>`;
+        });
+    }
+
+    function matricular() {
+        const periodo = document.getElementById('mat-periodo').value;
+        const disciplina = document.getElementById('mat-disciplina').value;
+        const turno = document.getElementById('mat-turno').value;
+        const creditos = parseInt(document.getElementById('mat-creditos').value);
+        let valid = true;
+
+        [['mat-periodo','err-periodo',periodo],['mat-disciplina','err-disciplina',disciplina],['mat-turno','err-turno',turno]].forEach(([id, err, val]) => {
+            const el = document.getElementById(id);
+            const errEl = document.getElementById(err);
+            if (!val) { el.classList.add('error'); errEl.classList.add('visible'); valid = false; }
+            else { el.classList.remove('error'); errEl.classList.remove('visible'); }
+        });
+
+        const creditosEl = document.getElementById('mat-creditos');
+        const errCreditos = document.getElementById('err-creditos');
+        if (creditos < 2 || creditos > 8) {
+            creditosEl.classList.add('error'); errCreditos.classList.add('visible'); valid = false;
+        } else {
+            creditosEl.classList.remove('error'); errCreditos.classList.remove('visible');
+        }
+
+        if (!valid) return;
+
+        if (state.matriculas.find(m => m.disciplina === disciplina && m.status === 'ativa')) {
+            showAlert('mat-alert', 'error', `Você já possui matrícula ativa em "${disciplina}".`);
+            return;
+        }
+
+        state.matriculas.push({ id: state.nextId++, disciplina, periodo, turno, creditos: isNaN(creditos) ? 4 : creditos, status: 'ativa' });
+        showAlert('mat-alert', 'success', `Matrícula em "${disciplina}" realizada com sucesso!`);
+        renderMatriculas();
+        renderDashboard();
+    }
+
+    function abrirModalCancelamento(id, nome) {
+        state.pendingCancel = id;
+        document.getElementById('modal-disc-nome').textContent = nome;
+        document.getElementById('modal-cancelar').classList.add('open');
+    }
+
+    function fecharModal() {
+        state.pendingCancel = null;
+        document.getElementById('modal-cancelar').classList.remove('open');
+    }
+
+    function confirmarCancelamento() {
+        const idx = state.matriculas.findIndex(m => m.id === state.pendingCancel);
+        if (idx !== -1) state.matriculas[idx].status = 'cancelada';
+        fecharModal();
+        renderMatriculas();
+        renderDashboard();
+        showAlert('mat-alert', 'success', 'Matrícula cancelada com sucesso.');
+    }
+
+    function validarEmail(email) {
+        return email.includes('@') && email.includes('.');
+    }
+
+    function validarCPF(cpf) {
+        const nums = cpf.replace(/\D/g, '');
+        return nums.length === 11;
+    }
+
+    function validarData(data) {
+        const regex = /^\d{2}\/\d{2}\/\d{4}$/;
+        if (!regex.test(data)) return false;
+        const [dia, mes, ano] = data.split('/').map(Number);
+        const hoje = new Date();
+        const nascimento = new Date(ano, mes - 1, dia);
+        const idadeAnos = (hoje - nascimento) / (1000 * 60 * 60 * 24 * 365.25);
+        return idadeAnos >= 16 && idadeAnos <= 80;
+    }
+
+    function salvarPerfil() {
+        const nome = document.getElementById('p-nome').value.trim();
+        const email = document.getElementById('p-email').value.trim();
+        const cpf = document.getElementById('p-cpf').value.trim();
+        const nasc = document.getElementById('p-nascimento').value.trim();
+        const senhaNova = document.getElementById('p-senha-nova').value;
+        const senhaConf = document.getElementById('p-senha-conf').value;
+        let valid = true;
+
+        const clearErro = (iId, eId) => { document.getElementById(iId).classList.remove('error'); document.getElementById(eId).classList.remove('visible'); };
+        const setErro = (iId, eId) => { document.getElementById(iId).classList.add('error'); document.getElementById(eId).classList.add('visible'); valid = false; };
+
+        clearErro('p-nome','err-nome'); clearErro('p-email','err-email');
+        clearErro('p-cpf','err-cpf'); clearErro('p-nascimento','err-nascimento');
+        clearErro('p-senha-nova','err-senha-nova'); clearErro('p-senha-conf','err-senha-conf');
+
+        if (!nome) setErro('p-nome','err-nome');
+        if (!validarEmail(email)) setErro('p-email','err-email');
+        if (!validarCPF(cpf)) setErro('p-cpf','err-cpf');
+        if (!nasc || !validarData(nasc)) setErro('p-nascimento','err-nascimento');
+        if (senhaNova) {
+            if (senhaNova.length < 6) setErro('p-senha-nova','err-senha-nova');
+            if (senhaNova !== senhaConf) setErro('p-senha-conf','err-senha-conf');
+        }
+
+        if (!valid) { showAlert('perfil-alert','error','Corrija os erros antes de salvar.'); return; }
+        showAlert('perfil-alert','success','Perfil atualizado com sucesso!');
+    }
+
+    function cancelarPerfil() {
+        ['p-nome','p-email','p-cpf','p-nascimento','p-telefone','p-endereco','p-senha-atual','p-senha-nova','p-senha-conf'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el && !el.readOnly) el.value = '';
+        });
+        document.getElementById('perfil-alert').className = 'alert';
+    }
+
+    function showAlert(containerId, type, msg) {
+        const el = document.getElementById(containerId);
+        el.className = `alert alert-${type} visible`;
+        el.innerHTML = `<span>${type === 'success' ? '✅' : '❌'}</span><span>${msg}</span>`;
+        setTimeout(() => { el.className = `alert alert-${type}`; }, 5000);
+    }
+
+    renderDashboard();
+</script>
+</body>
+</html>
